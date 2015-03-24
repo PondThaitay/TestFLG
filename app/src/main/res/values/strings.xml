@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">TestFLG</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="app_id">671784816280542</string>
+    <string name="update">Update Status</string>
+    <string name="postim">Check In</string>
+</resources>
