@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:gravity="center"
     android:orientation="vertical"
-    android:padding="20dp">
+    android:padding="20dp"
+    android:background="#ff1d1706">
 
     <com.facebook.widget.LoginButton
         android:id="@+id/fb_login_button"
@@ -15,6 +16,15 @@
         facebook:confirm_logout="false"
         facebook:fetch_user_info="true"
         android:layout_margin="5dp" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/profile_image"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        app:border_width="2dp"
+        app:border_color="#fff9fff3"
+        android:layout_marginBottom="5dp" />
 
     <com.facebook.widget.ProfilePictureView
         android:id="@+id/profilePicture"
@@ -31,7 +41,8 @@
         android:layout_margin="10dp"
         android:textSize="18sp"
         android:layout_below="@+id/fb_login_button"
-        android:gravity="center" />
+        android:gravity="center"
+        android:textColor="#fff9fff3" />
 
     <Button
         android:id="@+id/update_status"

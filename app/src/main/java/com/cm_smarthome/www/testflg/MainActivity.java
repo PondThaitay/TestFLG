@@ -40,6 +40,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONObject;
 
@@ -64,6 +65,8 @@ public class MainActivity extends FragmentActivity {
 
     private static String message = "ทดสอบ Post ผ่านแอพ ทดลอง";
 
+    ImageView imageView;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -73,6 +76,7 @@ public class MainActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_main);
 
+        imageView = (ImageView) findViewById(R.id.profile_image);
         mMap = ((SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map)).getMap();
 
@@ -86,9 +90,11 @@ public class MainActivity extends FragmentActivity {
             public void onUserInfoFetched(GraphUser user) {
                 if (user != null) {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-                    userName.setText("สวัสดี คุณ  " + user.getName());
+                    userName.setText(user.getName());
                     ProfilePictureView pictureView = (ProfilePictureView) findViewById(R.id.profilePicture);
                     pictureView.setProfileId(user.getId());
+                    Picasso.with(context).load("https://graph.facebook.com/" + user.getId() + "/picture?type=large").into(imageView);
+                    //imageView.setImageResource(R.mipmap.ic_launcher);
                     Log.e("user_id", user.getId());
                 } else {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
