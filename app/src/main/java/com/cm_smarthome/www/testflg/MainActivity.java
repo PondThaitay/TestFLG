@@ -2,11 +2,14 @@ package com.cm_smarthome.www.testflg;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
@@ -66,6 +69,8 @@ public class MainActivity extends FragmentActivity {
     private static String message = "ทดสอบ Post ผ่านแอพ ทดลอง";
 
     ImageView imageView;
+    private static final int SELECT_PICTURE = 1;
+    private String selectedImagePath;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -95,7 +100,7 @@ public class MainActivity extends FragmentActivity {
                     pictureView.setProfileId(user.getId());
                     Picasso.with(context).load("https://graph.facebook.com/" + user.getId() + "/picture?type=large").into(imageView);
                     //imageView.setImageResource(R.mipmap.ic_launcher);
-                    Log.e("user_id", user.getId());
+                    Log.e("user_id", user.getId() + user.getLocation());
                 } else {
                     mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
                     userName.setText("You are not logged");
@@ -105,24 +110,12 @@ public class MainActivity extends FragmentActivity {
 
         postImageBtn = (Button) findViewById(R.id.post_image);
         postImageBtn.setOnClickListener(new OnClickListener() {
-
             @Override
             public void onClick(View view) {
-                try {
-                    Bundle params = new Bundle();
-                    params.putString("access_token", "YOUR ACCESS TOKEN");
-                    params.putString("place", "203682879660695");  // YOUR PLACE ID
-                    params.putString("message", "I m here in this place");
-                    JSONObject coordinates = new JSONObject();
-                    coordinates.put("", LOCATION_SERVICE);
-                    coordinates.put("longitude", "YOUR LONGITUDE");
-                    params.putString("coordinates", coordinates.toString());
-                    params.putString("tags", "xxxx");//where xx indicates the User Id
-                    //String response = .request("me/checkins", params, "POST");
-                    //Log.d("Response", response);
-                } catch (Exception e) {
-
-                }
+                Intent intent = new Intent();
+                intent.setType("image/*");
+                intent.setAction(Intent.ACTION_GET_CONTENT);
+                startActivityForResult(Intent.createChooser(intent, "Select Picture"), SELECT_PICTURE);
             }
         });
 
@@ -137,6 +130,14 @@ public class MainActivity extends FragmentActivity {
 
         buttonsEnabled(false);
 
+    }
+
+    public String getPath(Uri uri) {
+        String[] projection = {MediaStore.Images.Media.DATA};
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+        cursor.moveToFirst();
+        return cursor.getString(column_index);
     }
 
     LocationListener listener = new LocationListener() {
@@ -184,17 +185,14 @@ public class MainActivity extends FragmentActivity {
         updateStatusBtn.setEnabled(isEnabled);
     }
 
-    public void postImage() {
+    public void postImage(Bitmap input) {
         if (checkPermissions()) {
-            Bitmap img = BitmapFactory.decodeResource(getResources(),
-                    R.mipmap.ic_launcher);
+            Bitmap img = input;
             Request uploadRequest = Request.newUploadPhotoRequest(
                     Session.getActiveSession(), img, new Request.Callback() {
                         @Override
                         public void onCompleted(Response response) {
                             Toast.makeText(context, "Photo uploaded successfully", Toast.LENGTH_LONG).show();
-
-
                         }
                     });
             uploadRequest.executeAsync();
@@ -288,6 +286,17 @@ public class MainActivity extends FragmentActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
+
+        if (resultCode == RESULT_OK) {
+            if (requestCode == SELECT_PICTURE) {
+                Uri selectedImageUri = data.getData();
+                selectedImagePath = getPath(selectedImageUri);
+                System.out.println("Image Path : " + selectedImagePath);
+                Bitmap bitmap = BitmapFactory.decodeFile(selectedImagePath);
+                postImage(bitmap);
+                //img.setImageURI(selectedImageUri);
+            }
+        }
     }
 
     @Override
